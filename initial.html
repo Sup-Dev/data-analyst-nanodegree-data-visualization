@@ -5,11 +5,6 @@
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
     
-    <style>
-        h2 {
-          text-align: center;
-        }
-    </style>
     <script>
         function draw(data) {
             var margin = 75,
@@ -18,20 +13,19 @@
 
             d3.select("body")
               .append("h2")
-              .text("Titanic Male/Female Survivor Ratio")
+              .text("Survivor distribution")
 
             var svg = d3.select("body")
               .append("svg")
                 .attr("width", width + margin)
-                .attr("height", height + margin + 10)
+                .attr("height", height + margin)
               .append('g')
                   .attr('class','chart');
             
             var chart = new dimple.chart(svg, data);
-            chart.addCategoryAxis("x", ["Pclass", "Sex"]);
+            chart.addCategoryAxis("x", "Sex");
             chart.addMeasureAxis("y", "Survived");
-            chart.addSeries("Sex", dimple.plot.bar);
-            chart.addLegend(400, 10, 380, 20, "right");
+            chart.addSeries(null, dimple.plot.bubble);
             chart.draw();
         }
     </script>
