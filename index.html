@@ -11,34 +11,68 @@
         }
     </style>
     <script>
+        // this function takes the data and creates a graph
         function draw(data) {
+            // setup the graph's dimensions
             var margin = 75,
                 width = 1400 - margin,
                 height = 500 - margin;
 
+            // setup the graph and a title
             d3.select("body")
               .append("h2")
-              .text("Titanic Male/Female Survivor Ratio")
+              .text("Titanic Disaster: Women had a much higher chance of survival")
 
+            // code to setup the graph
             var svg = d3.select("body")
               .append("svg")
                 .attr("width", width + margin)
                 .attr("height", height + margin + 10)
               .append('g')
                   .attr('class','chart');
+
+            // create/update fields
+            data.forEach(function(item) {
+                // create new fields
+                var s = item['Survived'];
+                item["Count"] = 1;
+                if (s == "0") {
+                    item['Status'] = "Dead";
+                } else {
+                    item['Status'] = "Survived";
+                }
+
+                // update field names
+                item['Passenger Class'] = item['Pclass'];
+                item['Passenger Count'] = item['Count'];
+                delete item['Pclass'];
+                delete item['Count'];
+            });
             
+            // draw the bar plot exhibiting the relationship between Pclass, Sex and Survived
             var chart = new dimple.chart(svg, data);
-            chart.addCategoryAxis("x", ["Pclass", "Sex"]);
-            chart.addMeasureAxis("y", "Survived");
-            chart.addSeries("Sex", dimple.plot.bar);
-            chart.addLegend(400, 10, 380, 20, "right");
+            var x = chart.addCategoryAxis("x", ["Passenger Class", "Sex"]);
+            var y = chart.addMeasureAxis("y", "Passenger Count");
+            var s = chart.addSeries("Status", dimple.plot.bar);
+            var legend = chart.addLegend(400, 10, 380, 20, "right");
+
+            // override legends order
+            legend._getEntries_old = legend._getEntries;
+            legend._getEntries = function()
+            {
+                return legend._getEntries_old.apply(this, arguments).reverse();
+            }
             chart.draw();
+            // change the x and y axis labels
+            x.titleShape.text("Male/Female among different Passenger classes");
+            y.titleShape.text("Number of Survivors");
         }
     </script>
 </head>
 
 <body>
     <script type="text/javascript">
+        // pass the titanic data to the draw function
         d3.csv("titanic.csv", draw);
     </script>
 </body>
